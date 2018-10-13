@@ -1,0 +1,41 @@
+#!/bin/sh
+# to build and deploy use: 
+# fragmenta deploy api
+# the service file must be called api on the server
+
+# IP of your server
+SERVER="NOHOST"
+
+# User on server
+USER="core" 
+
+# Local path 
+SRCPATH="$GOPATH/src/github.com/fragmenta/fragmenta-api"
+DSTPATH ="/srv/api.fragmenta.com"
+
+# multiple servers can be named explicitly
+if [ "$1" == "api" ]; then
+  # Insert server ip here
+  # SERVER="0.0.0.0"
+fi
+
+# exit if host not recognised
+if [ "$SERVER" == "NOHOST" ]; then
+  echo "No host supplied"
+  exit 0;
+fi
+
+echo "Deploying server to $USER@$SERVER...";
+
+# Upload files using rsync
+rsync -crlhzv -e ssh --exclude="log" --exclude="db" --exclude="public/files"  --exclude="fragmenta-server-local" --exclude=".*"\
+"$SRCPATH" \
+"$USER@$SERVER:$DSTPATH"
+
+# Restart the service remotely on server
+ssh $USER@$SERVER /bin/bash <<'EOT'
+systemctl restart api.service
+EOT
+
+echo "Completed"
+exit 0;

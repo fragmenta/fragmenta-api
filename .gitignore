@@ -1,0 +1,8 @@
+.DS_Store
+.idea/
+bin/fragmenta-server*
+log/*
+secrets/*
+db/backup/*
+public/assets/*/app-*
+public/files

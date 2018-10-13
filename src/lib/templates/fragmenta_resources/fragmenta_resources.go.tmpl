@@ -1,0 +1,87 @@
+// Package [[ .fragmenta_resources ]] represents the [[ .fragmenta_resource ]] resource
+package [[ .fragmenta_resources ]]
+
+import (
+	"time"
+
+	"github.com/fragmenta/query"
+
+	"github.com/fragmenta/fragmenta-app/src/lib/resource"
+	"github.com/fragmenta/fragmenta-app/src/lib/status"
+)
+
+// [[ .Fragmenta_Resource ]] handles saving and retreiving [[ .fragmenta_resources ]] from the database
+type [[ .Fragmenta_Resource ]] struct {
+	// resource.Base defines behaviour and fields shared between all resources
+	resource.Base
+	// status.ResourceStatus defines a status field and associated behaviour
+	status.ResourceStatus
+
+[[ .fragmenta_fields ]]
+}
+
+const (
+	// TableName is the database table for this resource
+	TableName = "[[ .fragmenta_resources ]]"
+	// KeyName is the primary key value for this resource
+	KeyName = "id"
+	// Order defines the default sort order in sql for this resource
+	Order = "name asc, id desc"
+)
+
+// AllowedParams returns an array of allowed param keys for Update and Create.
+func AllowedParams() []string {
+	return []string{"status", [[ .fragmenta_columns ]]}
+}
+
+// NewWithColumns creates a new [[ .fragmenta_resource ]] instance and fills it with data from the database cols provided.
+func NewWithColumns(cols map[string]interface{}) *[[ .Fragmenta_Resource ]] {
+
+	[[ .fragmenta_resource ]] := New()
+	[[ .fragmenta_resource ]].ID = resource.ValidateInt(cols["id"])
+	[[ .fragmenta_resource ]].CreatedAt = resource.ValidateTime(cols["created_at"])
+	[[ .fragmenta_resource ]].UpdatedAt = resource.ValidateTime(cols["updated_at"])
+	[[ .fragmenta_resource ]].Status = resource.ValidateInt(cols["status"])
+[[ .fragmenta_new_fields ]]
+	
+	return [[ .fragmenta_resource ]]
+}
+
+// New creates and initialises a new [[ .fragmenta_resource ]] instance.
+func New() *[[ .Fragmenta_Resource ]] {
+	[[ .fragmenta_resource ]] := &[[ .Fragmenta_Resource ]]{}
+	[[ .fragmenta_resource ]].CreatedAt = time.Now()
+	[[ .fragmenta_resource ]].UpdatedAt = time.Now()
+	[[ .fragmenta_resource ]].TableName = TableName
+	[[ .fragmenta_resource ]].KeyName = KeyName
+	[[ .fragmenta_resource ]].Status = status.Draft
+	return [[ .fragmenta_resource ]]
+}
+
+// Find fetches a single [[ .fragmenta_resource ]] record from the database by id.
+func Find(id int64) (*[[ .Fragmenta_Resource ]], error) {
+	result, err := Query().Where("id=?", id).FirstResult()
+	if err != nil {
+		return nil, err
+	}
+	return NewWithColumns(result), nil
+}
+
+// FindAll fetches all [[ .fragmenta_resource ]] records matching this query from the database.
+func FindAll(q *query.Query) ([]*[[ .Fragmenta_Resource ]], error) {
+
+	// Fetch query.Results from query
+	results, err := q.Results()
+	if err != nil {
+		return nil, err
+	}
+
+	// Return an array of [[ .fragmenta_resources ]] constructed from the results
+	var [[ .fragmenta_resources ]] []*[[ .Fragmenta_Resource ]]
+	for _, cols := range results {
+		p := NewWithColumns(cols)
+		[[ .fragmenta_resources ]] = append([[ .fragmenta_resources ]], p)
+	}
+
+	return [[ .fragmenta_resources ]], nil
+}

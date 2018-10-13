@@ -1,0 +1,58 @@
+package [[ .fragmenta_resource ]]actions
+
+import (
+	"github.com/fragmenta/auth/can"
+	"github.com/fragmenta/router"
+	"github.com/fragmenta/view"
+
+	"github.com/fragmenta/fragmenta-app/src/lib/auth"
+	"github.com/fragmenta/fragmenta-app/src/[[ .fragmenta_resources ]]"
+)
+
+// HandleIndex displays a list of [[ .fragmenta_resources ]].
+func HandleIndex(context router.Context) error {
+
+	// Authorise list [[ .fragmenta_resource ]]
+	err := can.List([[ .fragmenta_resources ]].New(), auth.CurrentUser(context))
+	if err != nil {
+		return router.NotAuthorizedError(err)
+	}
+
+	// Build a query
+	q := [[ .fragmenta_resources ]].Query()
+
+	// Order by required order, or default to id asc
+	switch context.Param("order") {
+
+	case "1":
+		q.Order("created desc")
+
+	case "2":
+		q.Order("updated desc")
+
+	case "3":
+		q.Order("name asc")
+
+	default:
+		q.Order("id asc")
+
+	}
+
+	// Filter if requested
+	filter := context.Param("filter")
+	if len(filter) > 0 {
+		q.Where("name ILIKE ?", filter)
+	}
+
+	// Fetch the [[ .fragmenta_resources ]]
+	results, err := [[ .fragmenta_resources ]].FindAll(q)
+	if err != nil {
+		return router.InternalError(err)
+	}
+
+	// Render the template
+	view := view.New(context)
+	view.AddKey("filter", filter)
+	view.AddKey("[[ .fragmenta_resources ]]", results)
+	return view.Render()
+}

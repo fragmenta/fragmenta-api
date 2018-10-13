@@ -1,0 +1,9 @@
+{
+    "[[ .fragmenta_resources ]]":[
+      {{ range $i,$m := .[[ .fragmenta_resources ]] }}
+       {{ set $0 "i" $i }}
+       {{ set $0 "[[ .fragmenta_resource ]]" $m }}
+       {{ template "[[ .fragmenta_resources ]]/views/show.html.got" $0 }}
+      {{ end }}
+    ]
+}

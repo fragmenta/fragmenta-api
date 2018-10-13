@@ -1,0 +1,6 @@
+{
+	"error":{{.status}}, 
+	"title":"{{.title}}",
+	"message":"{{.message}}",
+	"code":"{{.error}}"
+}
